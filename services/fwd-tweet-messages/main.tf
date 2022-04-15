@@ -49,16 +49,6 @@ resource "aws_dynamodb_table" "fwd_messages" {
     name = "created_at"
     type = "S"
   }
-
-  attribute {
-    name = "text"
-    type = "S"
-  }
-
-  attribute {
-    name = "author_name"
-    type = "S"
-  }
 }
 
 resource "aws_cloudwatch_log_group" "fwd_create_message" {
