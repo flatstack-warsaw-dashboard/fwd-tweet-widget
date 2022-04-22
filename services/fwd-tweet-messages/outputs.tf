@@ -10,7 +10,6 @@ output "function_arn" {
   value = aws_lambda_function.create_message.arn
 }
 
-
 output "base_url" {
   description = "Base URL for API Gateway stage."
 
