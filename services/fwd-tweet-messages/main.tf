@@ -19,8 +19,8 @@ data "archive_file" "create_message_lamda_target" {
   output_path = "${path.module}/build.zip"
 }
 
-resource "aws_lambda_function" "fwd_create_message" {
-  function_name = "fwdCreateMessage"
+resource "aws_lambda_function" "create_message" {
+  function_name = "createMessage"
 
   runtime = "nodejs14.x"
   handler = "createMessage.handler"
@@ -30,11 +30,11 @@ resource "aws_lambda_function" "fwd_create_message" {
     data.archive_file.create_message_lamda_target.output_path
   )
 
-  role = aws_iam_role.fwd_lambda_exec.arn
+  role = aws_iam_role.lambda_exec.arn
 }
 
-resource "aws_dynamodb_table" "fwd_messages" {
-  name = "fwd_messages"
+resource "aws_dynamodb_table" "messages" {
+  name = "messages"
   hash_key = "guid"
   range_key = "created_at"
   read_capacity = 1
@@ -51,14 +51,14 @@ resource "aws_dynamodb_table" "fwd_messages" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "fwd_create_message" {
-  name = "/aws/lambda/${aws_lambda_function.fwd_create_message.function_name}"
+resource "aws_cloudwatch_log_group" "create_message" {
+  name = "/aws/lambda/${aws_lambda_function.create_message.function_name}"
 
   retention_in_days = 7
 }
 
-resource "aws_iam_role" "fwd_lambda_exec" {
-  name = "fwd_create_message_lambda"
+resource "aws_iam_role" "lambda_exec" {
+  name = "create_message_lambda"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
@@ -75,7 +75,13 @@ resource "aws_iam_role" "fwd_lambda_exec" {
   })
 }
 
-resource "aws_apigatewayv2_api" "fwd_lambda_api" {
-  name = "serverless_lambda_gw"
+resource "aws_apigatewayv2_api" "lambda_api" {
+  name = "lambda_gateway"
   protocol_type = "HTTP"
+}
+
+resource "aws_apigatewayv2_stage" "production_stage" {
+  api_id = aws_apigatewayv2_api.lambda_api.id
+  name = "production"
+  auto_deploy = true
 }
