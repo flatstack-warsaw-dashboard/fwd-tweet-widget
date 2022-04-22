@@ -75,13 +75,39 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
+resource "aws_iam_role_policy_attachment" "lambda_executioner_policy" {
+  role = aws_iam_role.lambda_exec.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
 resource "aws_apigatewayv2_api" "lambda_api" {
   name = "lambda_gateway"
   protocol_type = "HTTP"
+}
+
+resource "aws_apigatewayv2_route" "create_message_route" {
+  api_id = aws_apigatewayv2_api.lambda_api.id
+  route_key = "$default"
+  target = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
 resource "aws_apigatewayv2_stage" "production_stage" {
   api_id = aws_apigatewayv2_api.lambda_api.id
   name = "production"
   auto_deploy = true
+}
+
+resource "aws_apigatewayv2_integration" "lambda_integration" {
+  api_id = aws_apigatewayv2_api.lambda_api.id
+  integration_method = "POST"
+  integration_type = "AWS_PROXY"
+  integration_uri = aws_lambda_function.create_message.invoke_arn
+}
+
+resource "aws_lambda_permission" "create_message_gateway_permission" {
+  statement_id = "AllowExecutionFromAPIGateway"
+  action = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.create_message.function_name
+  principal = "apigateway.amazonaws.com"
+  source_arn = "${aws_apigatewayv2_api.lambda_api.execution_arn}/*/*"
 }
