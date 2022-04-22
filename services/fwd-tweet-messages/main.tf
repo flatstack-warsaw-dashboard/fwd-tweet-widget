@@ -58,27 +58,18 @@ resource "aws_cloudwatch_log_group" "fwd_create_message" {
 }
 
 resource "aws_iam_role" "fwd_lambda_exec" {
-  name = "serverless_lambda"
+  name = "fwd_create_message_lambda"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
+        Sid    = ""
         Action = "sts:AssumeRole"
         Effect = "Allow"
-        Sid    = ""
         Principal = {
           Service = "lambda.amazonaws.com"
         }
-      },
-      {
-        Sid    = "AllowToAppend",
-        Action = "dynamodb:PutItem",
-        Effect = "Allow",
-        Principal = {
-          Service = "events.amazonaws.com"
-        },
-        resource = aws_dynamodb_table.fwd_messages.arn
       }
     ]
   })
