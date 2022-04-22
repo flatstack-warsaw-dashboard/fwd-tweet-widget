@@ -21,9 +21,15 @@ data "archive_file" "create_message_lamda_target" {
 
 resource "aws_lambda_function" "create_message" {
   function_name = "createMessage"
-
   runtime = "nodejs14.x"
   handler = "createMessage.handler"
+
+  environment {
+    variables = {
+      DB_TABLE = aws_dynamodb_table.messages.name
+      REGION = data.aws_region.current.name
+    }
+  }
 
   filename = data.archive_file.create_message_lamda_target.output_path
   source_code_hash = filebase64sha256(
