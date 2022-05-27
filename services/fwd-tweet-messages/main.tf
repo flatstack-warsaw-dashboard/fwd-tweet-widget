@@ -36,7 +36,7 @@ resource "aws_lambda_function" "create_message" {
     data.archive_file.create_message_lamda_target.output_path
   )
 
-  role = aws_iam_role.lambda_exec.arn
+  role = aws_iam_role.create_message_lambda_role.arn
 }
 
 resource "aws_dynamodb_table" "messages" {
@@ -45,7 +45,7 @@ resource "aws_dynamodb_table" "messages" {
   range_key = "created_at"
   read_capacity = 1
   write_capacity = 1
-  
+
   attribute {
     name = "guid"
     type = "S"
@@ -57,20 +57,13 @@ resource "aws_dynamodb_table" "messages" {
   }
 }
 
-resource "aws_cloudwatch_log_group" "create_message" {
-  name = "/aws/lambda/${aws_lambda_function.create_message.function_name}"
-
-  retention_in_days = 7
-}
-
-resource "aws_iam_role" "lambda_exec" {
-  name = "create_message_lambda"
+resource "aws_iam_role" "create_message_lambda_role" {
+  name = "create_message_lambda_role"
 
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
       {
-        Sid    = ""
         Action = "sts:AssumeRole"
         Effect = "Allow"
         Principal = {
@@ -81,9 +74,39 @@ resource "aws_iam_role" "lambda_exec" {
   })
 }
 
-resource "aws_iam_role_policy_attachment" "lambda_executioner_policy" {
-  role = aws_iam_role.lambda_exec.name
+resource "aws_iam_policy" "dynamodb_append" {
+  name = "dynamodb_append"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+        Action = [
+          "dynamodb:PutItem"
+        ],
+        Resource = [
+          "${aws_dynamodb_table.messages.arn}"
+        ]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_basic_policy_attachment" {
+  role = aws_iam_role.create_message_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_role_policy_attachment" "dynamodb_appender_policy_attachment" {
+  role = aws_iam_role.create_message_lambda_role.name
+  policy_arn = aws_iam_policy.dynamodb_append.arn
+}
+
+resource "aws_cloudwatch_log_group" "create_message" {
+  name = "/aws/lambda/${aws_lambda_function.create_message.function_name}"
+
+  retention_in_days = 7
 }
 
 resource "aws_apigatewayv2_api" "lambda_api" {

@@ -15,3 +15,9 @@ output "base_url" {
 
   value = aws_apigatewayv2_stage.production_stage.invoke_url
 }
+
+output "table_name" {
+  description = "Name of the DynamoDB table."
+
+  value = aws_dynamodb_table.messages.name
+}
