@@ -1,13 +1,13 @@
 output "function_name" {
   description = "Name of the Lambda function."
 
-  value = aws_lambda_function.create_message.function_name
+  value = aws_lambda_function.list_messages.function_name
 }
 
 output "function_arn" {
   description = "ARN for the function."
 
-  value = aws_lambda_function.create_message.arn
+  value = aws_lambda_function.list_messages.arn
 }
 
 output "base_url" {
