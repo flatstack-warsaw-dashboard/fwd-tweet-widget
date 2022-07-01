@@ -8,7 +8,7 @@ const appendMessage = async ({ text, author }) => {
   return await db.putItem({
     TableName: table,
     Item: {
-      guid: { S: AWS.util.uuid.v4() },
+      id: { N: "1" },
       created_at: { S: new Date().toISOString() },
       text: { S: text },
       author: { S: author },

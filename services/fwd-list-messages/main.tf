@@ -12,48 +12,37 @@ provider "aws" {
   region = "eu-central-1"
 }
 
-data "archive_file" "create_message_lamda_target" {
+data "archive_file" "list_messages_lambda_target" {
   type = "zip"
 
   source_dir  = "${path.module}/src"
   output_path = "${path.module}/build.zip"
 }
 
-resource "aws_lambda_function" "create_message" {
-  function_name = "createMessage"
+resource "aws_lambda_function" "list_messages" {
+  function_name = "listMessages"
   runtime = "nodejs14.x"
-  handler = "createMessage.handler"
+  handler = "listMessages.handler"
 
   environment {
     variables = {
-      DB_TABLE = aws_dynamodb_table.messages.name
+      DB_TABLE = var.messages_table_name
       REGION = data.aws_region.current.name
     }
   }
 
-  filename = data.archive_file.create_message_lamda_target.output_path
+  filename = data.archive_file.list_messages_lambda_target.output_path
   source_code_hash = filebase64sha256(
-    data.archive_file.create_message_lamda_target.output_path
+    data.archive_file.list_messages_lambda_target.output_path
   )
 
-  role = aws_iam_role.create_message_lambda_role.arn
+  role = aws_iam_role.list_messages_lambda_role.arn
 }
 
-resource "aws_dynamodb_table" "messages" {
-  name = "messages"
-  hash_key = "id"
-  read_capacity = 1
-  write_capacity = 1
+resource "aws_iam_role" "list_messages_lambda_role" {
+  name = "list_messages_lambda_role"
 
-  attribute {
-    name = "id"
-    type = "N"
-  }
-}
-
-resource "aws_iam_role" "create_message_lambda_role" {
-  name = "create_message_lambda_role"
-
+  # this policy defines which computing resources can assume this role
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -68,37 +57,45 @@ resource "aws_iam_role" "create_message_lambda_role" {
   })
 }
 
-resource "aws_iam_policy" "dynamodb_append" {
-  name = "dynamodb_append"
+resource "aws_iam_policy" "dynamodb_query" {
+  name = "dynamodb_query"
 
   policy = jsonencode({
-    Version = "2012-10-17",
+    Version = "2012-10-17"
     Statement = [
       {
-        Effect = "Allow",
-        Action = [
-          "dynamodb:PutItem"
-        ],
-        Resource = [
-          "${aws_dynamodb_table.messages.arn}"
-        ]
+        Effect = "Allow"
+        Action = ["dynamodb:Query", "dynamodb:Scan", "dynamodb:GetItem"]
+        Resource = ["${var.messages_table_arn}"]
       }
     ]
   })
+
+  # something wrong with this syntax
+  # policy = <<JSON
+  #   {
+  #     "Version": "2012-10-17",
+  #     "Statement": [{
+  #       "Effect": "Allow",
+  #       "Action": ["dynamodb:Query", "dynamodb:Scan", "dynamodb:GetItem"],
+  #       "Resource": ["${var.messages_table_arn}"]
+  #     }]
+  #   }
+  # JSON
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_basic_policy_attachment" {
-  role = aws_iam_role.create_message_lambda_role.name
+  role = aws_iam_role.list_messages_lambda_role.name
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-resource "aws_iam_role_policy_attachment" "dynamodb_appender_policy_attachment" {
-  role = aws_iam_role.create_message_lambda_role.name
-  policy_arn = aws_iam_policy.dynamodb_append.arn
+resource "aws_iam_role_policy_attachment" "dynamodb_query_policy_attachment" {
+  role = aws_iam_role.list_messages_lambda_role.name
+  policy_arn = aws_iam_policy.dynamodb_query.arn
 }
 
 resource "aws_cloudwatch_log_group" "create_message" {
-  name = "/aws/lambda/${aws_lambda_function.create_message.function_name}"
+  name = "/aws/lambda/${aws_lambda_function.list_messages.function_name}"
 
   retention_in_days = 7
 }
@@ -114,6 +111,7 @@ resource "aws_apigatewayv2_route" "create_message_route" {
   target = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
+
 resource "aws_apigatewayv2_stage" "production_stage" {
   api_id = aws_apigatewayv2_api.lambda_api.id
   name = "production"
@@ -124,13 +122,13 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id = aws_apigatewayv2_api.lambda_api.id
   integration_method = "POST"
   integration_type = "AWS_PROXY"
-  integration_uri = aws_lambda_function.create_message.invoke_arn
+  integration_uri = aws_lambda_function.list_messages.invoke_arn
 }
 
-resource "aws_lambda_permission" "create_message_gateway_permission" {
+resource "aws_lambda_permission" "list_messages_gateway_permission" {
   statement_id = "AllowExecutionFromAPIGateway"
   action = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.create_message.function_name
+  function_name = aws_lambda_function.list_messages.function_name
   principal = "apigateway.amazonaws.com"
   source_arn = "${aws_apigatewayv2_api.lambda_api.execution_arn}/*/*"
 }
