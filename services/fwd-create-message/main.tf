@@ -41,19 +41,13 @@ resource "aws_lambda_function" "create_message" {
 
 resource "aws_dynamodb_table" "messages" {
   name = "messages"
-  hash_key = "guid"
-  range_key = "created_at"
+  hash_key = "id"
   read_capacity = 1
   write_capacity = 1
 
   attribute {
-    name = "guid"
-    type = "S"
-  }
-
-  attribute {
-    name = "created_at"
-    type = "S"
+    name = "id"
+    type = "N"
   }
 }
 
