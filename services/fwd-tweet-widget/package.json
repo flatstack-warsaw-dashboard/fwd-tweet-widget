@@ -2,9 +2,10 @@
   "name": "fwd-tweet-widget",
   "version": "1.0.0",
   "description": "Widget to display messages from AWS Lambda",
-  "main": "index.js",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack"
   },
   "repository": {
     "type": "git",
@@ -15,5 +16,9 @@
   "bugs": {
     "url": "https://github.com/flatstack-warsaw-dashboard/fwd-tweet-widget/issues"
   },
-  "homepage": "https://github.com/flatstack-warsaw-dashboard/fwd-tweet-widget#readme"
+  "homepage": "https://github.com/flatstack-warsaw-dashboard/fwd-tweet-widget#readme",
+  "devDependencies": {
+    "webpack": "^5.73.0",
+    "webpack-cli": "^4.10.0"
+  }
 }
