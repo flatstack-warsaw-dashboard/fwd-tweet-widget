@@ -1,0 +1,19 @@
+{
+  "name": "fwd-tweet-widget",
+  "version": "1.0.0",
+  "description": "Widget to display messages from AWS Lambda",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/flatstack-warsaw-dashboard/fwd-tweet-widget.git"
+  },
+  "author": "Dmitry Barskov <dmitry.barskov@flatstack.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/flatstack-warsaw-dashboard/fwd-tweet-widget/issues"
+  },
+  "homepage": "https://github.com/flatstack-warsaw-dashboard/fwd-tweet-widget#readme"
+}
