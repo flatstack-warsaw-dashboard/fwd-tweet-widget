@@ -6,8 +6,8 @@ const db = new AWS.DynamoDB({ region });
 
 const buildMessage = ({ Item }) => ({
   text: Item.text.S,
-  createdAt: Item.text.S,
-  author: Item.author.S
+  createdAt: Item.created_at.S,
+  author: Item.author.S,
 });
 
 const fetchLastMessage = async () => await db.getItem({
@@ -17,24 +17,27 @@ const fetchLastMessage = async () => await db.getItem({
   }
 }).promise().then(buildMessage);
 
+const jsonResponse = ({ headers = {}, body = {}, status = 200 }) => ({
+  statusCode: status,
+  headers: {
+    'Content-Type': 'application/json',
+    'Access-Control-Allow-Headers' : 'Content-Type',
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'OPTIONS,GET,HEAD',
+    ...headers
+  },
+  body: JSON.stringify(body)
+});
+
 module.exports.handler = async (event) => {
   try {
-    return {
-      statusCode: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        messages: [await fetchLastMessage()]
-      }),
-    };
+    return jsonResponse({
+      body: { messages: [await fetchLastMessage()] }
+    });
   } catch (e) {
-    return {
-      statusCode: 422,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ error: { message: e.message, event } }),
-    };
+    return jsonResponse({
+      status: 422,
+      body: { error: { message: e.message, event } },
+    });
   }
 };
