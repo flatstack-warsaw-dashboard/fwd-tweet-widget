@@ -13,20 +13,29 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "dist_bucket" {
-  name = "widget_dist_bucket"
-  acl = "public-read"
+  bucket = "widget-dist-bucket"
+}
 
-  cors_rule = {
-    allowed_methods = "GET,HEAD,OPTIONS"
-    allowed_origins = "*"
+resource "aws_s3_bucket_acl" "bucket_acl" {
+  bucket = aws_s3_bucket.dist_bucket.id
+  acl = "public-read"
+}
+
+resource "aws_s3_bucket_cors_configuration" "bucket_cors_config" {
+  bucket = aws_s3_bucket.dist_bucket.id
+
+  cors_rule {
+    allowed_methods = ["GET", "HEAD"]
+    allowed_origins = ["*"]
     max_age_seconds = 31536000
-    expose_headers = "ETag,Cache-Control"
+    expose_headers = ["ETag", "Cache-Control"]
   }
 }
 
 resource "aws_s3_object" "dist_file" {
-  bucket = aws_s3_bucket.dist_bucket.name
-  key = "index.js"
-  source = "dist/main.js"
-  etag = filemd5("dist/main.js")
+  bucket = aws_s3_bucket.dist_bucket.bucket
+  key = "remote.js"
+  source = "dist/remote.js"
+  etag = filemd5("dist/remote.js")
+  acl = "public-read"
 }
