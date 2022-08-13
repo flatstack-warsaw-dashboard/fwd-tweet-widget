@@ -15,7 +15,7 @@ provider "aws" {
 data "archive_file" "list_messages_lambda_target" {
   type = "zip"
 
-  source_dir  = "${path.module}/src"
+  source_dir = "${path.module}/src"
   output_path = "${path.module}/build.zip"
 }
 
