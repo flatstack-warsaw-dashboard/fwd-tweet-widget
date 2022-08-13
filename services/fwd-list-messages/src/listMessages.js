@@ -21,7 +21,7 @@ const jsonResponse = ({ headers = {}, body = {}, status = 200 }) => ({
   statusCode: status,
   headers: {
     'Content-Type': 'application/json',
-    'Access-Control-Allow-Headers' : 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Methods': 'OPTIONS,GET,HEAD',
     ...headers
