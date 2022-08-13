@@ -27,8 +27,9 @@ resource "aws_lambda_function" "slack_bot" {
   environment {
     variables = {
       DB_TABLE = aws_dynamodb_table.slack_messages.name
-      AWS_REGION = data.aws_region.current.name
-      DEFAULT_WORKSPACE = vars.default_slack_workspace
+      REGION = data.aws_region.current.name
+      DEFAULT_WORKSPACE = var.default_slack_workspace
+      SLACK_BOT_TOKEN = var.slack_bot_token
     }
   }
 
@@ -43,7 +44,7 @@ resource "aws_lambda_function" "slack_bot" {
 resource "aws_dynamodb_table" "slack_messages" {
   name = "slack_messages"
   range_key = "guid"
-  hash_key = "workspace"
+  hash_key = "workspace_name"
   read_capacity = 1
   write_capacity = 1
 
