@@ -28,4 +28,14 @@ class SlackApi
     response = @http_client.get('users.info', user: user_id)
     response.dig('user', 'name')
   end
+
+  # curl -H "Authorization: Bearer $SLACK_BOT_TOKEN" 'https://slack.com/api/reactions.add' -X POST -H 'Content-Type: application/x-www-form-urlencoded; charset=utf-8' -H 'Accept: application/json; charset=utf-8' -d 'channel=C03T425PDL7' -d 'timestamp=1660401831.177479' -d 'name=robot_face'
+  def react(message)
+    @http_client.post(
+      'reactions.add',
+      name: 'robot_face',
+      channel: message.channel_id,
+      timestamp: message.ts
+    )
+  end
 end

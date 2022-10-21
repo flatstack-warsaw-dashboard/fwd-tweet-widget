@@ -12,12 +12,19 @@ class HttpClient
   end
 
   def get(path, params = {})
-    uri = URI("#{@base_url}/#{path}?#{URI.encode_www_form(params)}")
+    uri = compose_uri(path, params)
 
     request = Net::HTTP::Get.new(uri)
-    add_default_headers(request)
+    response = make_request(request)
+    JSON.parse(response.body)
+  end
 
-    response = make_request(uri, request)
+  def post(path, params = {})
+    uri = compose_uri(path)
+
+    request = Net::HTTP::Post.new(uri)
+    request.set_form_data(params)
+    response = make_request(request)
     JSON.parse(response.body)
   end
 
@@ -31,10 +38,15 @@ class HttpClient
     end
   end
 
-  def make_request(uri, request)
-    http = Net::HTTP.new(uri.host, uri.port)
+  def make_request(request)
+    add_default_headers(request)
+    http = Net::HTTP.new(request.uri.host, request.uri.port)
     http.use_ssl = true
     http.verify_mode = OpenSSL::SSL::VERIFY_PEER
     http.request(request)
+  end
+
+  def compose_uri(path, params = {})
+    URI("#{@base_url}/#{path}?#{URI.encode_www_form(params)}")
   end
 end

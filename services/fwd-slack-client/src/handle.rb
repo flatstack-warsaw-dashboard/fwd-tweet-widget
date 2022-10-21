@@ -14,13 +14,15 @@ DYNAMO_DB = Aws::DynamoDB::Client.new(region: REGION)
 SLACK_API = SlackApi.build
 
 # Lambda entrypoint
-def handle(event:)
+def handle(event:, **_kwargs)
   params = SlackParams.from_lambda_event(event)
 
   DYNAMO_DB.put_item(
-    item: SlackMessage.new(SLACK_API, params).to_h,
+    item: SlackMessage.new(params, SLACK_API).to_h,
     table_name: TABLE_NAME
   )
+
+  # SLACK_API.react(params)
 
   render json: {}
 end
