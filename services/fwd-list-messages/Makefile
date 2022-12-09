@@ -1,11 +1,11 @@
 test:
-	curl -X POST https://egtmm6l7gl.execute-api.eu-central-1.amazonaws.com/production
+	curl -X POST "$$(terraform output -raw base_url)"
 
 deploy:
-	cd "../fwd-create-message"; \
+	pushd "../fwd-last-message"; \
 		TABLE_ARN=$$(terraform output -raw table_arn); \
-		cd "../fwd-list-messages"; \
-		aws-vault exec fwd-tweet -- terraform apply -var "messages_table_arn=$$TABLE_ARN"
+		popd; \
+		aws-vault exec fwd-tweet -- terraform apply -var "messages_table_arn=$$TABLE_ARN" -auto-approve
 
 destroy:
 	aws-vault exec fwd-tweet -- terraform destroy
