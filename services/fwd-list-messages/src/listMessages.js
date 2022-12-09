@@ -2,20 +2,19 @@ const AWS = require('aws-sdk');
 
 const region = process.env.REGION;
 const table = process.env.DB_TABLE;
-const db = new AWS.DynamoDB({ region });
+const db = new AWS.DynamoDB.DocumentClient();
 
-const buildMessage = ({ Item }) => ({
-  text: Item.text.S,
-  createdAt: Item.created_at.S,
-  author: Item.author.S,
+const buildMessage = (messageData) => ({
+  text: messageData.text,
+  createdAt: messageData.posted_at,
+  author: messageData.author_name ?? messageData.author_id,
+  channel: messageData.channel_name ?? messageData.channel_id,
 });
 
-const fetchLastMessage = async () => await db.getItem({
+const fetchLastMessage = async () => await db.get({
   TableName: "messages",
-  Key: {
-    id: { N: "1" }
-  }
-}).promise().then(buildMessage);
+  Key: { id: 1 },
+}).promise().then(({ Item }) => buildMessage(Item));
 
 const jsonResponse = ({ headers = {}, body = {}, status = 200 }) => ({
   statusCode: status,
