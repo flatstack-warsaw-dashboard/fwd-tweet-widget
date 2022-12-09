@@ -3,7 +3,6 @@
 require 'securerandom'
 
 require_relative 'slack_api'
-require_relative 'slack_block'
 
 # Builds info about slack message as a plain hash
 class SlackMessage
