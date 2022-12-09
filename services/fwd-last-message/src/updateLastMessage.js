@@ -4,33 +4,21 @@ const region = process.env.REGION;
 const table = process.env.DB_TABLE;
 const db = new AWS.DynamoDB({ region });
 
-const appendMessage = async ({ text, author }) => {
+const appendMessage = async (data) => {
   return await db.putItem({
     TableName: table,
     Item: {
       id: { N: "1" },
-      created_at: { S: new Date().toISOString() },
-      text: { S: text },
-      author: { S: author },
+      ...data,
     },
   }).promise();
 };
 
-const messageParams = ({ body }) => {
-  const params = JSON.parse(body);
-  if (!params || typeof params !== 'object' || !params.message) {
-    throw new Error('Invalid message params. Body should be a JSON with message key.');
-  }
-  const message = params.message;
-  if (!message.text || !message.author) {
-    throw new Error('Invalid message params. Message text and author are required.');
-  }
-  return { text: message.text, author: message.author };
-};
-
 module.exports.handler = async (event) => {
   try {
-    await appendMessage(messageParams(event));
+    let inserts = event.Records.map(({ dynamodb }) => appendMessage(dynamodb.NewImage));
+
+    await Promise.allSettled(inserts);
 
     return {
       statusCode: 200,
