@@ -47,6 +47,8 @@ resource "aws_dynamodb_table" "slack_messages" {
   hash_key = "workspace_name"
   read_capacity = 1
   write_capacity = 1
+  stream_enabled = true
+  stream_view_type = "NEW_IMAGE"
 
   attribute {
     name = "guid"

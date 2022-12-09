@@ -15,3 +15,15 @@ output "base_url" {
 
   value = aws_apigatewayv2_stage.production_stage.invoke_url
 }
+
+output "table_arn" {
+  description = "DynamoDB table where all slack messages are saved."
+
+  value = aws_dynamodb_table.slack_messages.arn
+}
+
+output "table_stream_arn" {
+  description = "DynamoDB table stream where all slack messages are saved."
+
+  value = aws_dynamodb_table.slack_messages.stream_arn
+}
