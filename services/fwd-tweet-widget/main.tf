@@ -33,9 +33,13 @@ resource "aws_s3_bucket_cors_configuration" "bucket_cors_config" {
 }
 
 resource "aws_s3_object" "dist_file" {
+  for_each = fileset("dist/", "*.js")
+
   bucket = aws_s3_bucket.dist_bucket.bucket
-  key = "remote.js"
-  source = "dist/remote.js"
-  etag = filemd5("dist/remote.js")
+  key = "${each.value}"
+  source = "dist/${each.value}"
+  etag = filemd5("dist/${each.value}")
   acl = "public-read"
+  content_type  = "application/javascript"
+  cache_control = "max-age=86400"
 }

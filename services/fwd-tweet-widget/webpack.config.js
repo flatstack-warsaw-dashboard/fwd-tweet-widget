@@ -7,7 +7,7 @@ export default {
   entry: {},
   output: {
     filename: '[name].js',
-    chunkFilename: '[id].[contenthash].js',
+    chunkFilename: '[id].js',
     path: new URL('./dist', import.meta.url).pathname,
     clean: true,
     publicPath: 'auto',
