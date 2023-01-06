@@ -39,9 +39,9 @@ class TweetWidget extends HTMLElement {
   }
 
   fetchMessages() {
-    return fetch("https://egtmm6l7gl.execute-api.eu-central-1.amazonaws.com/production")
+    return fetch(__API_URL__)
       .then(response => response.json())
-      .catch(_ => ({ messages: [] }))
+      .catch(error => ({ messages: [{ text: error.name, author: error.type, createdAt: new Date() }] }))
       .then(({ messages }) => messages.map(buildMessage));
   }
 

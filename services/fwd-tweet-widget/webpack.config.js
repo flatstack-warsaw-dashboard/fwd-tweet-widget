@@ -22,6 +22,9 @@ export default {
       exposes: { '.': './index.js' },
       shared: {},
     }),
+    new webpack.DefinePlugin({
+      __API_URL__: `'${process.env.LAMBDA_API_URL}'`,
+    }),
   ],
   devServer: {
     allowedHosts: 'all',
