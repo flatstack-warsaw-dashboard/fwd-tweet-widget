@@ -1,4 +1,10 @@
 terraform {
+  backend "s3" {
+    bucket = "fwd-tweet-state"
+    key = "widgets/fwd-list-messages/terraform.tfstate"
+    region = "eu-central-1"
+    encrypt = true
+  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
