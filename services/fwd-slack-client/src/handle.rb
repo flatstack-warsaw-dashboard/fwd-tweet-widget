@@ -16,9 +16,10 @@ SLACK_API = SlackApi.build
 # Lambda entrypoint
 def handle(event:, **_kwargs)
   params = SlackParams.from_lambda_event(event)
+  slack_message = SlackMessage.new(params, SLACK_API)
 
   DYNAMO_DB.put_item(
-    item: SlackMessage.new(params, SLACK_API).to_h,
+    item: slack_message.to_h,
     table_name: TABLE_NAME
   )
 
