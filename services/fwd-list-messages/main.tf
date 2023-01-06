@@ -88,6 +88,17 @@ resource "aws_cloudwatch_log_group" "create_message" {
   retention_in_days = 7
 }
 
+resource "aws_apigatewayv2_authorizer" "ip_allowlist_authorizer" {
+  api_id                            = aws_apigatewayv2_api.lambda_api.id
+  authorizer_type                   = "REQUEST"
+  enable_simple_responses           = "true"
+  authorizer_uri                    = "arn:aws:apigateway:eu-central-1:lambda:path/2015-03-31/functions/arn:aws:lambda:eu-central-1:157940840475:function:authorizer/invocations"
+  authorizer_payload_format_version = "2.0"
+  identity_sources                  = ["$context.identity.sourceIp"]
+  name                              = "ip_allowlist_authorizer"
+  authorizer_result_ttl_in_seconds  = 0
+}
+
 resource "aws_apigatewayv2_api" "lambda_api" {
   name = "lambda_gateway"
   protocol_type = "HTTP"
@@ -95,6 +106,8 @@ resource "aws_apigatewayv2_api" "lambda_api" {
 
 resource "aws_apigatewayv2_route" "create_message_route" {
   api_id = aws_apigatewayv2_api.lambda_api.id
+  authorizer_id = aws_apigatewayv2_authorizer.ip_allowlist_authorizer.id
+  authorization_type = "CUSTOM"
   route_key = "$default"
   target = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
