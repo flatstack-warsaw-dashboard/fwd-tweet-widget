@@ -25,12 +25,13 @@ module "last_message" {
 module "list_messages" {
   source = "./services/fwd-list-messages"
   messages_table_arn = module.last_message.table_arn
-  messages_table_name = "messages"
+  messages_table_name = module.last_message.table_name
 }
 
 module "slack_client" {
   source = "./services/fwd-slack-client"
   slack_bot_token = var.slack_bot_token
+  default_workspace = var.default_workspace
 }
 
 module "tweet_widget" {
