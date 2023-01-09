@@ -13,6 +13,14 @@ class SlackParams
     new(JSON.parse(event['body']))
   end
 
+  def challenge?
+    @webhook_event.key?('challenge')
+  end
+
+  def challenge
+    @webhook_event['challenge']
+  end
+
   def to_json(*_args)
     JSON.generate(@webhook_event)
   end

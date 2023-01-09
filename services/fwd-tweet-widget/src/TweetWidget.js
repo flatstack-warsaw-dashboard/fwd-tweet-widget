@@ -8,13 +8,13 @@ const renderMessages = (rootElement) => (messages) => {
     <article>
       <section>
         <header>
-          ${message.author}
+          <span>${message.author}<span>
           <span class="secondary"> said:</span>
         </header>
         <main>${message.text}</main>
         <footer>
           <span class="secondary">${dayOfWeek(message.createdAt)} </span>
-          ${formatDate(message.createdAt)}
+          <time>${formatDate(message.createdAt)}</time>
         </footer>
       <section>
     </article>
@@ -41,8 +41,8 @@ class TweetWidget extends HTMLElement {
   fetchMessages() {
     return fetch(__API_URL__)
       .then(response => response.json())
-      .catch(error => ({ messages: [{ text: error.name, author: error.type, createdAt: new Date() }] }))
-      .then(({ messages }) => messages.map(buildMessage));
+      .then(({ messages }) => messages.map(buildMessage))
+      .catch(error => ({ messages: [{ text: error.name, author: error.type, createdAt: new Date() }] }));
   }
 
   styles() {

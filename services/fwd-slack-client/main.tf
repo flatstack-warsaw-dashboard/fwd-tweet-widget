@@ -1,10 +1,4 @@
 terraform {
-  backend "s3" {
-    bucket = "fwd-tweet-state"
-    key = "widgets/fwd-slack-client/terraform.tfstate"
-    region = "eu-central-1"
-    encrypt = true
-  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -34,7 +28,6 @@ resource "aws_lambda_function" "slack_bot" {
     variables = {
       DB_TABLE = aws_dynamodb_table.slack_messages.name
       REGION = data.aws_region.current.name
-      DEFAULT_WORKSPACE = var.default_slack_workspace
       SLACK_BOT_TOKEN = var.slack_bot_token
     }
   }

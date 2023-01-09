@@ -1,10 +1,4 @@
 terraform {
-  backend "s3" {
-    bucket = "fwd-tweet-state"
-    key = "widgets/fwd-last-message/terraform.tfstate"
-    region = "eu-central-1"
-    encrypt = true
-  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -32,7 +26,7 @@ resource "aws_lambda_function" "update_last_message" {
 
   environment {
     variables = {
-      DB_TABLE = aws_dynamodb_table.messages.name
+      DB_TABLE = aws_dynamodb_table.last_message.name
       REGION = data.aws_region.current.name
     }
   }
@@ -45,8 +39,8 @@ resource "aws_lambda_function" "update_last_message" {
   role = aws_iam_role.update_last_message_lambda_role.arn
 }
 
-resource "aws_dynamodb_table" "messages" {
-  name = "messages"
+resource "aws_dynamodb_table" "last_message" {
+  name = "last_message"
   hash_key = "id"
   read_capacity = 1
   write_capacity = 1
@@ -86,7 +80,7 @@ resource "aws_iam_policy" "dynamodb_only_put" {
           "dynamodb:PutItem"
         ],
         Resource = [
-          "${aws_dynamodb_table.messages.arn}"
+          "${aws_dynamodb_table.last_message.arn}"
         ]
       }
     ]
