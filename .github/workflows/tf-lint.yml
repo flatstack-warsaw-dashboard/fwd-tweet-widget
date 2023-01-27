@@ -19,6 +19,9 @@ jobs:
       uses: hashicorp/setup-terraform@v1
 
     - name: Terraform Init
+      env:
+        TF_VAR_slack_bot_token: ${{ secrets.SLACK_BOT_API_TOKEN }}
+        TF_VAR_default_workspace: ${{ secrets.DEFAULT_SLACK_WORKSPACE_NAME }}
       run: |
         terraform init
         terraform validate
