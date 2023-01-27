@@ -1,30 +1,5 @@
-const buildMessage = (message) => ({
-  ...message,
-  createdAt: new Date(message.createdAt)
-});
-
-const renderMessages = (rootElement) => (messages) => {
-  rootElement.innerHTML = messages.map(message => `
-    <article>
-      <section>
-        <header>
-          <span>${message.author}<span>
-          <span class="secondary"> said:</span>
-        </header>
-        <main>${message.text}</main>
-        <footer>
-          <span class="secondary">${dayOfWeek(message.createdAt)} </span>
-          <time>${formatDate(message.createdAt)}</time>
-        </footer>
-      <section>
-    </article>
-  `).join('\n');
-};
-
-const dayOfWeek = (date) => date.toLocaleString('default', { weekday: 'short' });
-
-const formatDate = (date) => date.toLocaleDateString('default', { month: 'short', day: '2-digit', year: 'numeric' });
-
+import renderMessages from './renderMessages';
+import fetchMessages from './fetchMessages';
 
 class TweetWidget extends HTMLElement {
   constructor() {
@@ -35,14 +10,7 @@ class TweetWidget extends HTMLElement {
     shadow.appendChild(this.wrapper);
     shadow.appendChild(this.styles());
 
-    this.fetchMessages().then(renderMessages(this.wrapper));
-  }
-
-  fetchMessages() {
-    return fetch(__API_URL__)
-      .then(response => response.json())
-      .then(({ messages }) => messages.map(buildMessage))
-      .catch(error => ({ messages: [{ text: error.name, author: error.type, createdAt: new Date() }] }));
+    fetchMessages().then(renderMessages(this.wrapper));
   }
 
   styles() {
