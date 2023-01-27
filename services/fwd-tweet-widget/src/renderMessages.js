@@ -14,7 +14,9 @@ const renderMessages = (rootElement) => (messages) => {
         <main>${escapeHtml(message.text)}</main>
         <footer>
           <span class="secondary">${dayOfWeek(message.createdAt)} </span>
-          <time datetime="${message.createdAt.toISOString()}">${formatDate(message.createdAt)}</time>
+          <time datetime="${message.createdAt.toISOString()}">
+            ${formatDate(message.createdAt)}
+          </time>
         </footer>
       <section>
     </article>
