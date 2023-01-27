@@ -3,8 +3,33 @@ Widget that displays some message
 
 ## Architecture
 0. Widget is built with webpack moudle federation and deployed to S3
-0. Widget gets the last tweet via lambda connected to a websocket
-0. The-last-tweet-lambda accesses DynamoDB to find the last tweet
-0. DynamoDB is populated via another lambda with HTTP endpoint
+0. Widget gets the last tweet via a Lambda function
+    which is just reading `last_message` table
+0. `last_message` DynamoDB table contains only the last message from Slack and
+    it gets updated on insert to `slack_messages` table
+0. `slack_messages` table stores all messages from Slack
+0. `slack_messages` table gets updated by `slackBot` Lambda function
+0. `slackBot` triggered via webhook requested by Slack
 
-The whole pipeline is set up manually.
+```
+                           AWS Lambda                   AWS DynamoDB
+|-------|                 |----------|               |----------------|
+| Slack | -- webhooks --> | slackBot | -- writes --> | slack_messages |
+|-------|                 |----------|               |----------------|
+                                                             |
+                                                     an uptade triggers
+                                                             |
+                                                             V
+                      AWS DynamoDB                      AWS Lambda
+                    |--------------|               |-------------------|
+                    | last_message | <-- writes -- | updateLastMessage |
+                    |--------------|               |-------------------|
+                           ^
+                            \
+                            reads
+                                \
+ static js                   AWS Lambda
+|--------|                 |--------------|
+| widget | -- requests --> | listMessages |
+|--------|                 |--------------|
+```

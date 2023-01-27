@@ -1,6 +1,10 @@
 import { URL } from 'node:url';
 import webpack from 'webpack';
 
+if (!process.env.LAMBDA_API_URL) {
+  throw new Error("Provide LAMBDA_API_URL environment variable!");
+}
+
 export default {
   context: new URL('./src', import.meta.url).pathname,
   mode: 'development',

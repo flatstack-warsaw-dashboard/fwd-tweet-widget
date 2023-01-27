@@ -12,7 +12,7 @@ const buildMessage = (messageData) => ({
 });
 
 const fetchLastMessage = async () => await db.get({
-  TableName: "messages",
+  TableName: table,
   Key: { id: 1 },
 }).promise().then(({ Item }) => buildMessage(Item));
 

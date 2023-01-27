@@ -1,10 +1,4 @@
 terraform {
-  backend "s3" {
-    bucket = "fwd-tweet-state"
-    key = "widgets/fwd-list-messages/terraform.tfstate"
-    region = "eu-central-1"
-    encrypt = true
-  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
@@ -71,7 +65,7 @@ resource "aws_iam_policy" "dynamodb_query_role" {
     Statement = [
       {
         Effect = "Allow"
-        Action = ["dynamodb:Query", "dynamodb:Scan", "dynamodb:GetItem"]
+        Action = ["dynamodb:GetItem"]
         Resource = ["${var.messages_table_arn}"]
       }
     ]

@@ -16,6 +16,8 @@ SLACK_API = SlackApi.build
 # Lambda entrypoint
 def handle(event:, **_kwargs)
   params = SlackParams.from_lambda_event(event)
+  return render_text(params.challenge) if params.challenge?
+
   slack_message = SlackMessage.new(params, SLACK_API)
 
   DYNAMO_DB.put_item(
@@ -25,11 +27,14 @@ def handle(event:, **_kwargs)
 
   # SLACK_API.react(params)
 
-  render json: {}
+  render_json({})
+rescue => error
+  puts "[ERROR] #{error.class}: #{error} (event: #{event})"
+  render_json({ message: error.message }, status: 500)
 end
 
 # Create json response
-def render(json:, status: 200)
+def render_json(json, status: 200)
   {
     statusCode: status,
     headers: {
@@ -39,5 +44,18 @@ def render(json:, status: 200)
       'Access-Control-Allow-Methods': 'OPTIONS,GET,HEAD'
     },
     body: JSON.generate(json)
+  }
+end
+
+def render_text(text, status: 200)
+  {
+    statusCode: status,
+    headers: {
+      'Content-Type': 'text/plain',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'OPTIONS,GET,HEAD'
+    },
+    body: text
   }
 end

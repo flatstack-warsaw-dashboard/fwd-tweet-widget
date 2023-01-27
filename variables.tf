@@ -6,4 +6,6 @@ variable "slack_bot_token" {
 
 variable "default_workspace" {
   type = string
+
+  description = "Default workspace when slack does not send it in events"
 }

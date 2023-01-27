@@ -1,13 +1,10 @@
 terraform {
-  backend "s3" {
-    bucket = "fwd-tweet-state"
-    key = "widgets/fwd-tweet-widget/terraform.tfstate"
-    region = "eu-central-1"
-    encrypt = true
-  }
   required_providers {
     aws = {
       source  = "hashicorp/aws"
+    }
+    null = {
+      source = "hashicorp/null"
     }
   }
 
@@ -38,14 +35,25 @@ resource "aws_s3_bucket_cors_configuration" "bucket_cors_config" {
   }
 }
 
+# Runs npm build before uploading assets
+# Requires running `terraform apply` twice
+resource "null_resource" "build_dist" {
+  provisioner "local-exec" {
+    working_dir = "${path.module}"
+    command = "env LAMBDA_API_URL=${var.lambda_api_url} npm run build"
+  }
+}
+
 resource "aws_s3_object" "dist_file" {
-  for_each = fileset("dist/", "*.js")
+  for_each = fileset("${path.module}/dist/", "*")
 
   bucket = aws_s3_bucket.dist_bucket.bucket
   key = "${each.value}"
-  source = "dist/${each.value}"
-  etag = filemd5("dist/${each.value}")
+  source = "${path.module}/dist/${each.value}"
+  etag = filemd5("${path.module}/dist/${each.value}")
   acl = "public-read"
   content_type  = "application/javascript"
   cache_control = "max-age=86400"
+
+  depends_on = [null_resource.build_dist]
 }
