@@ -11,10 +11,15 @@ const buildMessage = (messageData) => ({
   channel: messageData.channel_name ?? messageData.channel_id,
 });
 
+const inspect = (arg) => {
+  console.debug(arg);
+  return arg;
+};
+
 const fetchLastMessage = async () => await db.get({
   TableName: table,
   Key: { id: 1 },
-}).promise().then(({ Item }) => buildMessage(Item));
+}).promise().then(inspect).then(({ Item }) => buildMessage(Item));
 
 const jsonResponse = ({ headers = {}, body = {}, status = 200 }) => ({
   statusCode: status,
@@ -31,12 +36,19 @@ const jsonResponse = ({ headers = {}, body = {}, status = 200 }) => ({
 module.exports.handler = async (event) => {
   try {
     return jsonResponse({
-      body: { messages: [await fetchLastMessage()] }
+      body: {
+        messages: [await fetchLastMessage()],
+      },
     });
   } catch (e) {
     return jsonResponse({
       status: 422,
-      body: { error: { message: e.message, event } },
+      body: {
+        error: {
+          message: e.message,
+          event,
+        },
+      },
     });
   }
 };
