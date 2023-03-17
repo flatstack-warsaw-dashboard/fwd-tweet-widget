@@ -35,7 +35,7 @@ export default {
     webSocketServer: 'ws',
     client: {
       webSocketTransport: 'ws',
-      webSocketURL: 'ws://10.14.95.51:8080/ws'
+      webSocketURL: 'ws://127.0.0.1:8080/ws'
     },
     headers: {
       'Access-Control-Allow-Origin': '*',
