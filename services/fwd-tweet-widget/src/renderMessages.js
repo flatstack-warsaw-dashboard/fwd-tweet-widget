@@ -1,5 +1,5 @@
-import formatDate from "./formatDate";
-import dayOfWeek from "./dayOfWeek";
+import formatDate from "./formatDate.js";
+import dayOfWeek from "./dayOfWeek.js";
 
 const escapeHtml = (text) => new Option(text).innerHTML;
 

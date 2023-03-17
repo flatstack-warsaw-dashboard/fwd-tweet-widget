@@ -1,5 +1,5 @@
-import renderMessages from './renderMessages';
-import fetchMessages from './fetchMessages';
+import renderMessages from './renderMessages.js';
+import fetchMessages from './fetchMessages.js';
 
 class TweetWidget extends HTMLElement {
   constructor() {

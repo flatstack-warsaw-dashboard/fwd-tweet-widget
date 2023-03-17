@@ -18,6 +18,13 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v1
 
+    - name: Step name
+      uses: aws-actions/aws-secretsmanager-get-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-central-1
+
     - name: Terraform Init
       env:
         TF_VAR_slack_bot_token: ${{ secrets.SLACK_BOT_API_TOKEN }}

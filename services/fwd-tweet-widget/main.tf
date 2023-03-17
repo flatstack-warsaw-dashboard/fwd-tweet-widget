@@ -38,6 +38,9 @@ resource "aws_s3_bucket_cors_configuration" "bucket_cors_config" {
 # Runs npm build before uploading assets
 # Requires running `terraform apply` twice
 resource "null_resource" "build_dist" {
+  triggers = {
+    always_run = "${timestamp()}"
+  }
   provisioner "local-exec" {
     working_dir = "${path.module}"
     command = "env LAMBDA_API_URL=${var.lambda_api_url} npm run build"
