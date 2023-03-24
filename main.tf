@@ -18,23 +18,23 @@ provider "aws" {
 }
 
 module "last_message" {
-  source = "./services/fwd-last-message"
+  source = "./src/last-message"
   input_table_stream_arn = "${module.slack_client.table_stream_arn}"
 }
 
 module "list_messages" {
-  source = "./services/fwd-list-messages"
+  source = "./src/list-messages"
   messages_table_arn = module.last_message.table_arn
   messages_table_name = module.last_message.table_name
 }
 
 module "slack_client" {
-  source = "./services/fwd-slack-client"
+  source = "./src/slack-client"
   slack_bot_token = var.slack_bot_token
   default_workspace = var.default_workspace
 }
 
 module "tweet_widget" {
-  source = "./services/fwd-tweet-widget"
+  source = "./src/widget"
   lambda_api_url = module.list_messages.base_url
 }

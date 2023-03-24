@@ -2,7 +2,7 @@ import renderMessages from './renderMessages.js';
 import fetchMessages from './fetchMessages.js';
 
 class GenericTweetWidget extends HTMLElement {
-  constructor() {
+  constructor(href) {
     super();
 
     const shadow = this.attachShadow({ mode: 'open' });
@@ -10,7 +10,7 @@ class GenericTweetWidget extends HTMLElement {
     shadow.appendChild(this.wrapper);
     shadow.appendChild(this.styles());
 
-    fetchMessages(this.getAttribute('href')).then(renderMessages(this.wrapper));
+    fetchMessages(href).then(renderMessages(this.wrapper));
   }
 
   styles() {
