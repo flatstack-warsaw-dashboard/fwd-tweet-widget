@@ -117,7 +117,7 @@ resource "aws_cloudwatch_log_group" "slack_bot" {
 }
 
 resource "aws_apigatewayv2_api" "lambda_api" {
-  name = "lambda_gateway"
+  name = "slack_webhook_gateway"
   protocol_type = "HTTP"
 }
 

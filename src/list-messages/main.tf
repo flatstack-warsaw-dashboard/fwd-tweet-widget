@@ -100,7 +100,7 @@ resource "aws_apigatewayv2_authorizer" "ip_allowlist_authorizer" {
 }
 
 resource "aws_apigatewayv2_api" "lambda_api" {
-  name = "lambda_gateway"
+  name = "list_messages_api_gateway"
   protocol_type = "HTTP"
 }
 
@@ -117,6 +117,10 @@ resource "aws_apigatewayv2_stage" "production_stage" {
   api_id = aws_apigatewayv2_api.lambda_api.id
   name = "production"
   auto_deploy = true
+  default_route_settings {
+    throttling_burst_limit = 999
+    throttling_rate_limit = 9999
+  }
 }
 
 resource "aws_apigatewayv2_integration" "lambda_integration" {

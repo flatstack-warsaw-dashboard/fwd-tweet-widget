@@ -49,37 +49,13 @@ resource "null_resource" "build_dist" {
   }
 }
 
-# resource "aws_s3_object" "dist_file" {
-#   for_each = fileset("${path.module}/dist/", "*")
+resource "aws_s3_object" "dist_file" {
+  for_each = fileset("${path.module}/dist/", "*")
 
-#   bucket = aws_s3_bucket.dist_bucket.bucket
-#   key = "${each.value}"
-#   source = "${path.module}/dist/${each.value}"
-#   etag = filemd5("${path.module}/dist/${each.value}")
-#   acl = "public-read"
-#   content_type  = "application/javascript"
-#   cache_control = "max-age=86400"
-
-#   depends_on = [null_resource.build_dist]
-# }
-
-resource "aws_s3_object" "dist_file_index_js_js" {
   bucket = aws_s3_bucket.dist_bucket.bucket
-  key = "index_js.js"
-  source = "${path.module}/dist/index_js.js"
-  etag = filemd5("${path.module}/dist/index_js.js")
-  acl = "public-read"
-  content_type  = "application/javascript"
-  cache_control = "max-age=86400"
-
-  depends_on = [null_resource.build_dist]
-}
-
-resource "aws_s3_object" "dist_file_remote_js" {
-  bucket = aws_s3_bucket.dist_bucket.bucket
-  key = "remote.js"
-  source = "${path.module}/dist/remote.js"
-  etag = filemd5("${path.module}/dist/remote.js")
+  key = "${each.value}"
+  source = "${path.module}/dist/${each.value}"
+  etag = filemd5("${path.module}/dist/${each.value}")
   acl = "public-read"
   content_type  = "application/javascript"
   cache_control = "max-age=86400"
