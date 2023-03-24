@@ -28,6 +28,7 @@ resource "aws_lambda_function" "list_messages" {
     variables = {
       DB_TABLE = var.messages_table_name
       REGION = data.aws_region.current.name
+      WORKSPACE_NAME = var.workspace_name
     }
   }
 
@@ -65,7 +66,7 @@ resource "aws_iam_policy" "dynamodb_query_role" {
     Statement = [
       {
         Effect = "Allow"
-        Action = ["dynamodb:GetItem"]
+        Action = ["dynamodb:GetItem", "dynamodb:Query"]
         Resource = ["${var.messages_table_arn}"]
       }
     ]

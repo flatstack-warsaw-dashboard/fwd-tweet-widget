@@ -5,13 +5,19 @@ const table = process.env.DB_TABLE;
 const db = new AWS.DynamoDB({ region });
 
 const appendMessage = async (data) => {
+  console.log(`Inserting into ${table}...`, data);
   return await db.putItem({
     TableName: table,
-    Item: {
-      id: { N: "1" },
-      ...data,
-    },
-  }).promise();
+    Item: data,
+  }).promise()
+    .then((response) => {
+      console.info('Received response from DynamoDB', response);
+      return response;
+    })
+    .catch((error) => {
+      console.error('Error inserting to DynamoDB', error);
+      throw error;
+    });
 };
 
 module.exports.handler = async (event) => {

@@ -29,7 +29,6 @@ resource "aws_lambda_function" "slack_bot" {
       DB_TABLE = aws_dynamodb_table.slack_messages.name
       REGION = data.aws_region.current.name
       SLACK_BOT_TOKEN = var.slack_bot_token
-      DEFAULT_WORKSPACE = var.default_workspace
     }
   }
 

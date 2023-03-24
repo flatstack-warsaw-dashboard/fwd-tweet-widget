@@ -1,6 +1,7 @@
 const AWS = require('aws-sdk');
 
 const region = process.env.REGION;
+const WORKSPACE_NAME = process.env.WORKSPACE_NAME;
 const table = process.env.DB_TABLE;
 const db = new AWS.DynamoDB.DocumentClient();
 
@@ -11,15 +12,16 @@ const buildMessage = (messageData) => ({
   channel: messageData.channel_name ?? messageData.channel_id,
 });
 
-const inspect = (arg) => {
-  console.debug(arg);
-  return arg;
-};
-
-const fetchLastMessage = async () => await db.get({
-  TableName: table,
-  Key: { id: 1 },
-}).promise().then(inspect).then(({ Item }) => buildMessage(Item));
+const fetchLastMessage = async () => await db.query({
+  TableName: 'last_message',
+  KeyConditionExpression: 'workspace_name = :hkey',
+  ExpressionAttributeValues: { ':hkey': WORKSPACE_NAME }
+}).promise()
+  .then((response) => {
+    console.debug('Response from DynamoDB', response);
+    return response;
+  })
+  .then(({ Items }) => Items.map(buildMessage));
 
 const jsonResponse = ({ headers = {}, body = {}, status = 200 }) => ({
   statusCode: status,
@@ -37,7 +39,7 @@ module.exports.handler = async (event) => {
   try {
     return jsonResponse({
       body: {
-        messages: [await fetchLastMessage()],
+        messages: await fetchLastMessage(),
       },
     });
   } catch (e) {
