@@ -28,24 +28,27 @@ const cssStyles = `
 `;
 
 const renderMessages = (rootElement) => (messages) => {
-  const renderedMessages = messages.map(message => `
-    <article>
-      <h2>#${message.channel}</h2>
-      <section>
-        <header>
-          <span>${message.author}<span>
-          <span class="secondary"> said:</span>
-        </header>
-        <section class="main">${escapeHtml(message.text)}</section>
-        <footer>
-          <span class="secondary">${dayOfWeek(message.createdAt)}</span>
-          <time datetime="${message.createdAt.toISOString()}">
-            ${formatDate(message.createdAt)}
-          </time>
-        </footer>
-      <section>
-    </article>
-  `);
+  const renderedMessages = messages
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, 3)
+    .map(message => `
+      <article>
+        <h2>#${message.channel}</h2>
+        <section>
+          <header>
+            <span>${message.author}<span>
+            <span class="secondary"> said:</span>
+          </header>
+          <section class="main">${escapeHtml(message.text)}</section>
+          <footer>
+            <span class="secondary">${dayOfWeek(message.createdAt)}</span>
+            <time datetime="${message.createdAt.toISOString()}">
+              ${formatDate(message.createdAt)}
+            </time>
+          </footer>
+        <section>
+      </article>
+    `);
 
   rootElement.innerHTML = [cssStyles, ...renderedMessages].join('\n');
 };
