@@ -5,20 +5,22 @@ const escapeHtml = (text) => new Option(text).innerHTML;
 
 const cssStyles = `
 <style>
-  h2 {
-    font-size: 16px;
+  h2.inline {
+    font-size: inherit;
+    display: inline;
   }
 
   article {
     font-family: monospace;
+    padding: 5px;
   }
 
-  section {
-    text-indent: 2ch;
+  article:not(:last-child) {
+    border-bottom: 1px solid black;
   }
 
   .main {
-    text-indent: 4ch;
+    padding-left: 2ch;
   }
 
   .secondary {
@@ -33,20 +35,19 @@ const renderMessages = (rootElement) => (messages) => {
     .slice(0, 3)
     .map(message => `
       <article>
-        <h2>#${message.channel}</h2>
-        <section>
-          <header>
-            <span>${message.author}<span>
-            <span class="secondary"> said:</span>
-          </header>
-          <section class="main">${escapeHtml(message.text)}</section>
-          <footer>
-            <span class="secondary">${dayOfWeek(message.createdAt)}</span>
-            <time datetime="${message.createdAt.toISOString()}">
-              ${formatDate(message.createdAt)}
-            </time>
-          </footer>
-        <section>
+        <header>
+          <span>${message.author}<span>
+          <span class="secondary">said</span>
+          <span>in</span>
+          <h2 class="inline">#${message.channel}</h2><span>:</span>
+        </header>
+        <section class="main">${escapeHtml(message.text)}</section>
+        <footer>
+          <span class="secondary">${dayOfWeek(message.createdAt)}</span>
+          <time datetime="${message.createdAt.toISOString()}">
+            ${formatDate(message.createdAt)}
+          </time>
+        </footer>
       </article>
     `);
 
