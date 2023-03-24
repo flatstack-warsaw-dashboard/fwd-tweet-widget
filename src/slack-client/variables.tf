@@ -3,7 +3,3 @@ variable "slack_bot_token" {
 
   description = "Bot User OAuth Token. Can be found in Settings > Install App."
 }
-
-variable "default_workspace" {
-  type = string
-}

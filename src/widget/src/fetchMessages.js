@@ -8,7 +8,7 @@ const fetchMessages = (apiUrl) =>
     .then(response => response.json())
     .then(({ messages }) => messages.map(buildMessage))
     .catch(error => [
-      { text: error.name, author: error.type, createdAt: new Date() }
+      { text: error.message, author: error.name, createdAt: new Date() }
     ]);
 
 export default fetchMessages;

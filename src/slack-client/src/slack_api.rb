@@ -16,7 +16,7 @@ class SlackApi
 
   def resolve_workspace_name(workspace_id)
     response = @http_client.get('team.info', team: workspace_id)
-    response.dig('team', 'name') || ENV.fetch('DEFAULT_WORKSPACE')
+    response.dig('team', 'name')
   end
 
   def resolve_channel_name(channel_id)

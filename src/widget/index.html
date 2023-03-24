@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Widget test</title>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "GenericTweetWidget": "./src/GenericTweetWidget.js"
+      }
+    }
+  </script>
+</head>
+
+<body>
+  <script type="module">
+    import GenericTweetWidget from 'GenericTweetWidget';
+
+    class TweetWidget extends GenericTweetWidget {
+      constructor() {
+        // TODO: insert API URL instead of null for development
+        super(null);
+      }
+    }
+
+    window.customElements.define('fwd-tweet-widget', TweetWidget);
+  </script>
+
+  <main>
+    <fwd-tweet-widget></fwd-tweet-widget>
+  </main>
+</body>
+
+</html>

@@ -41,13 +41,19 @@ resource "aws_lambda_function" "update_last_message" {
 
 resource "aws_dynamodb_table" "last_message" {
   name = "last_message"
-  hash_key = "id"
+  hash_key = "workspace_name"
+  range_key = "channel_name"
   read_capacity = 1
   write_capacity = 1
 
   attribute {
-    name = "id"
-    type = "N"
+    name = "workspace_name"
+    type = "S"
+  }
+
+  attribute {
+    name = "channel_name"
+    type = "S"
   }
 }
 
@@ -80,7 +86,7 @@ resource "aws_iam_policy" "dynamodb_only_put" {
           "dynamodb:PutItem"
         ],
         Resource = [
-          "${aws_dynamodb_table.last_message.arn}"
+          aws_dynamodb_table.last_message.arn
         ]
       }
     ]
