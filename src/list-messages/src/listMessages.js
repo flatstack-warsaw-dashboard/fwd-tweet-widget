@@ -1,8 +1,7 @@
 const AWS = require('aws-sdk');
 
-const region = process.env.REGION;
 const WORKSPACE_NAME = process.env.WORKSPACE_NAME;
-const table = process.env.DB_TABLE;
+const TABLE_NAME = process.env.DB_TABLE;
 const db = new AWS.DynamoDB.DocumentClient();
 
 const buildMessage = (messageData) => ({

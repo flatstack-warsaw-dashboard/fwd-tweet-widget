@@ -37,8 +37,7 @@ const renderMessages = (rootElement) => (messages) => {
       <article>
         <header>
           <span>${message.author}<span>
-          <span class="secondary">said</span>
-          <span>in</span>
+          <span class="secondary">in</span>
           <h2 class="inline">#${message.channel}</h2><span>:</span>
         </header>
         <section class="main">${escapeHtml(message.text)}</section>
